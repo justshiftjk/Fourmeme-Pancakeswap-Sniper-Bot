@@ -1,6 +1,6 @@
-# 🎯 BNB Sniper Bot - Four.meme Edition
+# 🎯 BNB Sniper Bot - Pancakeswap & Four.meme Edition
 
-Advanced BNB Chain sniper bot for detecting and buying tokens instantly on four.meme platform with MEV support.
+Advanced BNB Chain sniper bot for detecting and buying tokens instantly on Pancakeswap platform with MEV support.
 
 ## 🚀 Features
 
@@ -16,186 +16,85 @@ Advanced BNB Chain sniper bot for detecting and buying tokens instantly on four.
 - **Slippage Protection**: Configurable slippage tolerance
 - **Comprehensive Logging**: Winston-based logging with file rotation
 
-## 📋 Prerequisites
 
-- Node.js v16+ and npm
-- BNB Chain RPC endpoint (Recommended: QuickNode, Ankr, or BSC official)
-- WebSocket endpoint for mempool monitoring
-- Wallet with BNB for trading and gas fees
+## Configuration
 
-## 🛠️ Installation
+### Environment Variables
 
-1. **Clone the repository**
-```bash
-git clone <your-repo-url>
-cd Solana-Sniper-Memecoin-Bot
-```
+Required:
+- `PRIVATE_KEY` - Your wallet private key
+- `SNIPER_CONTRACT_ADDRESS` - Your sniper contract address
+- `WS_PROVIDER_URL` - WebSocket provider URL for event monitoring
+- `RPC_PROVIDER_URL` - RPC provider URL for transactions
+- `SEND_BNB` - Amount of BNB to send per trade (e.g., "0.0005")
 
-2. **Install dependencies**
-```bash
-npm install
-```
+Optional:
+- `TOKEN_NAME_CONTAINS` - Filter out tokens by name (see Token Filtering section)
+- `MIN_LIQUIDITY_BNB` - Minimum liquidity filter (see Liquidity Filtering section)
 
-3. **Configure environment**
-```bash
-cp .env.example .env
-```
+### Token Filtering (Optional)
 
-Edit `.env` with your settings:
+You can filter out tokens by name before buying. Add this to your `.env` file:
+
+- `TOKEN_NAME_CONTAINS` - Tokens with names containing these strings will be **SKIPPED** (case-insensitive)
+  - Multiple keywords can be separated by commas
+  - The bot will **SKIP** tokens if the name contains **ANY** of the specified keywords
+  - The bot will **BUY** all other tokens that don't match the filter
+
+**Examples:**
 ```env
-# Blockchain Configuration
-BSC_RPC_URL=https://bsc-dataseed.binance.org/
-BSC_WSS_URL=wss://bsc-dataseed.binance.org/
-CHAIN_ID=56
+# Skip tokens where name contains "Moon" (buy everything else)
+TOKEN_NAME_CONTAINS=Moon
 
-# Wallet Configuration
-PRIVATE_KEY=0xYourPrivateKeyHere
-WALLET_ADDRESS=0xYourWalletAddress
+# Skip tokens where name contains "Moon" OR "DOGE" OR "Pepe" (buy everything else)
+TOKEN_NAME_CONTAINS=Moon,DOGE,Pepe
 
-# Trading Configuration
-BUY_AMOUNT=0.1
-SLIPPAGE_BPS=100
-GAS_LIMIT=500000
-MAX_GAS_PRICE=10
-
-# Four.meme Configuration
-FOUR_MEME_FACTORY_ADDRESS=0x...
-FOUR_MEME_ROUTER_ADDRESS=0x...
-
-# MEV Configuration
-ENABLE_FRONTRUN=true
-ENABLE_BACKRUN=true
+# Skip tokens where name contains "Safe" OR "Moon" OR "Rocket" (buy everything else)
+TOKEN_NAME_CONTAINS=Safe,Moon,Rocket
 ```
 
-4. **Build the project**
-```bash
-npm run build
+**Note:** 
+- If `TOKEN_NAME_CONTAINS` is not set or empty, the bot will buy all detected tokens
+- Filtering is case-insensitive
+- Keywords are separated by commas (spaces around commas are automatically trimmed)
+- This is a **blacklist** filter - tokens matching the keywords are excluded
+
+### Liquidity Filtering (Optional)
+
+You can filter tokens by minimum liquidity before buying. Add this to your `.env` file:
+
+- `MIN_LIQUIDITY_BNB` - Minimum total liquidity required in BNB (e.g., "1.0" for 1 BNB minimum)
+  - Pools with less liquidity than this will be skipped
+  - Total liquidity = 2 × WBNB reserve (since AMM pools maintain equal value on both sides)
+
+**Examples:**
+```env
+# Only buy tokens with at least 1 BNB total liquidity
+MIN_LIQUIDITY_BNB=1.0
+
+# Only buy tokens with at least 5 BNB total liquidity
+MIN_LIQUIDITY_BNB=5.0
+
+# Only buy tokens with at least 0.5 BNB total liquidity
+MIN_LIQUIDITY_BNB=0.5
 ```
 
-## 🎮 Usage
+**Note:**
+- If `MIN_LIQUIDITY_BNB` is not set or 0, liquidity filtering is disabled
+- The bot calculates total liquidity as 2 × WBNB reserve
+- This helps avoid low-liquidity tokens that may be rug pulls or have high slippage
 
-### Start the Bot
+## Development Process
 
-**Development mode (with hot reload):**
-```bash
-npm run dev
-```
+✔ Monitoring (Completed)
 
-**Production mode:**
-```bash
-npm run build
-npm start
-```
+✔ Sniping (Completed)
 
-### Expected Output
+✔ Sniping as first buyer (Completed)
 
-```
-╔═══════════════════════════════════════════════════════════╗
-║                                                           ║
-║           🎯 BNB SNIPER BOT - FOUR.MEME 🎯              ║
-║                                                           ║
-║         High-Speed Token Sniper with MEV Support          ║
-║                                                           ║
-╚═══════════════════════════════════════════════════════════╝
+✔ Selling logic (Completed)
 
-2024-01-01 12:00:00 [info]: Validating configuration...
-2024-01-01 12:00:00 [info]: ✅ Configuration valid
-2024-01-01 12:00:00 [info]: 🚀 Starting BNB Sniper Bot...
-2024-01-01 12:00:00 [info]: ⚙️  Configuration:
-2024-01-01 12:00:00 [info]:    Chain ID: 56
-2024-01-01 12:00:00 [info]:    Wallet: 0x...
-2024-01-01 12:00:00 [info]:    Balance: 1.5 BNB
-2024-01-01 12:00:00 [info]:    Buy Amount: 0.1 BNB
-2024-01-01 12:00:00 [info]:    Slippage: 1%
-2024-01-01 12:00:00 [info]:    Frontrun: ENABLED
-```
-
-## 📁 Project Structure
-
-```
-├── src/
-│   ├── bot/
-│   │   └── sniperBot.ts        # Main bot logic
-│   ├── config/
-│   │   └── index.ts            # Configuration management
-│   ├── contracts/
-│   │   └── abis.ts             # Smart contract ABIs
-│   ├── services/
-│   │   ├── tokenMonitor.ts     # Token creation monitoring
-│   │   ├── mevExecutor.ts      # MEV execution strategies
-│   │   └── tradeExecutor.ts    # Trade execution logic
-│   ├── types/
-│   │   └── index.ts            # TypeScript type definitions
-│   ├── utils/
-│   │   ├── logger.ts           # Logging utility
-│   │   └── web3Provider.ts     # Web3 connection management
-│   └── index.ts                # Entry point
-├── logs/                       # Log files
-├── .env                        # Environment configuration
-├── package.json
-└── tsconfig.json
-```
-
-## ⚙️ Configuration
-
-### Trading Parameters
-
-| Parameter | Description | Default |
-|-----------|-------------|---------|
-| `BUY_AMOUNT` | BNB amount to spend per trade | 0.1 |
-| `SLIPPAGE_BPS` | Slippage tolerance in basis points (100 = 1%) | 100 |
-| `GAS_LIMIT` | Maximum gas limit per transaction | 500000 |
-| `GAS_PRICE_MULTIPLIER` | Gas price multiplier for faster inclusion | 1.2 |
-| `MAX_GAS_PRICE` | Maximum gas price in GWEI | 10 |
-
-### MEV Configuration
-
-- **ENABLE_FRONTRUN**: Execute transactions before target transaction
-- **ENABLE_BACKRUN**: Execute transactions immediately after target
-- **MEV_SHARE_PERCENTAGE**: Percentage of MEV profit to keep (80 = 80%)
-
-## 🔐 Security
-
-- **Private Key Security**: Never commit `.env` file or expose private keys
-- **Gas Limits**: Bot has configurable gas limits to prevent runaway costs
-- **Balance Validation**: Checks wallet balance before each trade
-- **Slippage Protection**: Configurable slippage to prevent sandwich attacks
-- **Error Handling**: Comprehensive error handling and logging
-
-## ⚠️ Risks & Disclaimers
-
-**WARNING: This bot is for educational purposes. Use at your own risk.**
-
-- **Financial Risk**: You can lose all invested funds
-- **Smart Contract Risk**: New tokens may be malicious or honeypots
-- **MEV Risk**: Front-running/back-running can fail and waste gas
-- **Gas Costs**: Failed transactions still consume gas fees
-- **Market Risk**: Extreme volatility in memecoin markets
-
-**Always:**
-- Test on BSC testnet first
-- Start with small amounts
-- Monitor bot activity
-- Understand the code before running
-
-
-
-## 📊 Performance Tips
-
-1. **Use Premium RPC**: QuickNode or Ankr for faster response times
-2. **Enable Mempool**: WSS endpoint enables 0-block detection
-3. **Optimize Gas**: Balance between speed and cost
-4. **MEV Strategy**: Test frontrun vs backrun for your use case
-5. **Multiple Wallets**: Distribute across wallets to avoid nonce conflicts
-
-## 🤝 Contributing
-
-Contributions are welcome! Please:
-1. Fork the repository
-2. Create feature branch
-3. Test thoroughly on testnet
-4. Submit pull request
-
+✔ Token filtering (Completed)
 
 ## 📩 Contact  
 For inquiries, custom integrations, or tailored solutions, reach out via:  
