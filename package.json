@@ -1,36 +1,22 @@
 {
-  "name": "bnb-sniper-bot",
+  "name": "dextra_bsc",
   "version": "1.0.0",
-  "description": "Advanced BNB Chain sniper bot for four.meme token launches",
-  "main": "dist/index.js",
-  "scripts": {
-    "build": "tsc",
-    "start": "node dist/index.js",
-    "dev": "ts-node src/index.ts",
-    "watch": "tsc -w",
-    "clean": "rimraf dist",
-    "test-connection": "ts-node scripts/test-connection.ts",
-    "check-balance": "ts-node scripts/check-balance.ts"
-  },
-  "keywords": ["bnb", "sniper", "bot", "mev", "dex"],
-  "author": "",
   "license": "MIT",
+  "scripts": {
+    "start": "ts-node-dev index.ts"
+  },
   "dependencies": {
-    "@flashbots/ethers-provider-bundle": "^1.0.0",
-    "axios": "^1.6.0",
-    "bignumber.js": "^9.1.2",
-    "dotenv": "^16.3.1",
-    "ethers": "^5.7.2",
-    "web3": "^4.3.0",
-    "winston": "^3.11.0",
-    "ws": "^8.14.2"
+    "dotenv": "^17.2.3",
+    "ethers": "^6.15.0",
+    "ws": "^8.18.0"
   },
   "devDependencies": {
-    "@types/node": "^20.10.0",
-    "@types/ws": "^8.5.10",
-    "rimraf": "^5.0.5",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.13.4",
+    "@types/ws": "^8.5.13",
+    "@validate-ethereum-address/core": "^1.0.6",
     "ts-node": "^10.9.2",
-    "typescript": "^5.3.3"
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.7.3"
   }
 }
-
